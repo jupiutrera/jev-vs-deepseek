@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: control-de-seguridad
+    ports:
+      - "127.0.0.1:5173:5173"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./videos:/app/videos
+    restart: unless-stopped

@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-01T14:55:55.135Z",
+  "title": "Design System: Control de seguridad · DeepSeek vs Jev",
+  "extensions": {
+    "colorMeta": {
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#1A1C2C",
+        "tonalRamp": [
+          "#040407",
+          "#0A0B12",
+          "#11121D",
+          "#171928",
+          "#3C3E4C",
+          "#6A6B76",
+          "#A3A4AB",
+          "#DDDDDF"
+        ]
+      },
+      "slate": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "#333C57",
+        "tonalRamp": [
+          "#08090D",
+          "#141823",
+          "#212739",
+          "#2E364E",
+          "#525970",
+          "#7A8092",
+          "#ADB1BC",
+          "#E0E2E6"
+        ]
+      },
+      "stone": {
+        "role": "neutral",
+        "displayName": "Stone",
+        "canonical": "#566C86",
+        "tonalRamp": [
+          "#0D1014",
+          "#222B36",
+          "#384657",
+          "#4D6179",
+          "#6F8298",
+          "#919FB0",
+          "#BBC4CF",
+          "#E6E9ED"
+        ]
+      },
+      "stone-light": {
+        "role": "neutral",
+        "displayName": "Stone Light",
+        "canonical": "#94B0C2",
+        "tonalRamp": [
+          "#161A1D",
+          "#3B464E",
+          "#60727E",
+          "#859EAF",
+          "#A4BCCB",
+          "#B9CCD7",
+          "#D4DFE7",
+          "#EFF3F6"
+        ]
+      },
+      "parchment": {
+        "role": "neutral",
+        "displayName": "Parchment",
+        "canonical": "#F4F4F4",
+        "tonalRamp": [
+          "#252525",
+          "#626262",
+          "#9F9F9F",
+          "#DCDCDC",
+          "#F6F6F6",
+          "#F8F8F8",
+          "#FBFBFB",
+          "#FDFDFD"
+        ]
+      },
+      "wood-dark": {
+        "role": "tertiary",
+        "displayName": "Dark Wood",
+        "canonical": "#5A3A2A",
+        "tonalRamp": [
+          "#0E0906",
+          "#241711",
+          "#3B261B",
+          "#513426",
+          "#73584A",
+          "#947F75",
+          "#BDB0AA",
+          "#E6E1DF"
+        ]
+      },
+      "wood": {
+        "role": "tertiary",
+        "displayName": "Wood",
+        "canonical": "#A0683A",
+        "tonalRamp": [
+          "#181009",
+          "#402A17",
+          "#684426",
+          "#905E34",
+          "#AE7F58",
+          "#C19D7F",
+          "#D9C3B0",
+          "#F1E8E1"
+        ]
+      },
+      "fire": {
+        "role": "tertiary",
+        "displayName": "Fire",
+        "canonical": "#EF7D57",
+        "tonalRamp": [
+          "#24130D",
+          "#603223",
+          "#9B5139",
+          "#D7714E",
+          "#F19170",
+          "#F5AB92",
+          "#F9CBBC",
+          "#FDECE6"
+        ]
+      },
+      "green": {
+        "role": "secondary",
+        "displayName": "Seal Green",
+        "canonical": "#38B764",
+        "tonalRamp": [
+          "#081B0F",
+          "#164928",
+          "#247741",
+          "#32A55A",
+          "#56C27B",
+          "#7ED09A",
+          "#AFE2C1",
+          "#E1F4E8"
+        ]
+      },
+      "red": {
+        "role": "secondary",
+        "displayName": "Seal Red",
+        "canonical": "#B13E53",
+        "tonalRamp": [
+          "#1B090C",
+          "#471921",
+          "#732836",
+          "#9F384B",
+          "#BD5B6D",
+          "#CC828F",
+          "#E0B2BA",
+          "#F3E2E5"
+        ]
+      },
+      "yellow": {
+        "role": "secondary",
+        "displayName": "Seal Yellow",
+        "canonical": "#FFCD75",
+        "tonalRamp": [
+          "#261F12",
+          "#66522F",
+          "#A6854C",
+          "#E6B969",
+          "#FFD58A",
+          "#FFDFA5",
+          "#FFEBC8",
+          "#FFF8EA"
+        ]
+      },
+      "purple": {
+        "role": "secondary",
+        "displayName": "Seal Purple",
+        "canonical": "#5D275D",
+        "tonalRamp": [
+          "#0E060E",
+          "#251025",
+          "#3C193C",
+          "#542354",
+          "#754775",
+          "#967396",
+          "#BEA9BE",
+          "#E7DFE7"
+        ]
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "LLM Blue",
+        "canonical": "#41A6F6",
+        "tonalRamp": [
+          "#0A1925",
+          "#1A4262",
+          "#2A6CA0",
+          "#3B95DD",
+          "#5EB3F7",
+          "#84C5F9",
+          "#B3DBFB",
+          "#E3F2FE"
+        ]
+      },
+      "cyan": {
+        "role": "tertiary",
+        "displayName": "Magic Cyan",
+        "canonical": "#73EFF7",
+        "tonalRamp": [
+          "#112425",
+          "#2E6063",
+          "#4B9BA1",
+          "#68D7DE",
+          "#88F1F8",
+          "#A4F5FA",
+          "#C7F9FC",
+          "#EAFDFE"
+        ]
+      },
+      "lime": {
+        "role": "primary",
+        "displayName": "Jev Lime",
+        "canonical": "#A7F070",
+        "tonalRamp": [
+          "#192411",
+          "#43602D",
+          "#6D9C49",
+          "#96D865",
+          "#B4F285",
+          "#C6F5A2",
+          "#DCF9C6",
+          "#F2FDEA"
+        ]
+      },
+      "navy": {
+        "role": "neutral",
+        "displayName": "Navy",
+        "canonical": "#29366F",
+        "tonalRamp": [
+          "#060811",
+          "#10162C",
+          "#1B2348",
+          "#253164",
+          "#495485",
+          "#747CA1",
+          "#A9AFC5",
+          "#DFE1E9"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Points",
+        "purpose": "Scale 4: each counter points number."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Scale 3: title card and queue count."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Scale 2: counter names, phase name, wait seconds, results headline, lost count."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Scale 1: cards, stats rows, tables, footers."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "stamp-raise",
+        "value": "80ms",
+        "purpose": "Stamp lifted before the slam."
+      },
+      {
+        "name": "stamp-ink",
+        "value": "200ms ease-out",
+        "purpose": "Ink ring around the stamped parcel."
+      },
+      {
+        "name": "lane-shake",
+        "value": "120ms, 1px, 40ms steps",
+        "purpose": "Counter shakes on each stamp."
+      },
+      {
+        "name": "hit-stop",
+        "value": "34ms",
+        "purpose": "Belt and parcels freeze two frames on each stamp."
+      },
+      {
+        "name": "parcel-arc",
+        "value": "300ms cubic ease-in-out",
+        "purpose": "Stamped parcel flies into its bin."
+      },
+      {
+        "name": "parcel-fall",
+        "value": "260ms ease-out + 640ms smoke",
+        "purpose": "Lost parcel drops into the pit."
+      },
+      {
+        "name": "phase-banner",
+        "value": "200ms ease-out in, 2000ms hold, 140ms out",
+        "purpose": "Phase change announcement."
+      },
+      {
+        "name": "odometer",
+        "value": "80ms ease-out",
+        "purpose": "Changed digit rolls up in its fixed cell."
+      },
+      {
+        "name": "results-stagger",
+        "value": "40ms per row; chart drawn over 900ms",
+        "purpose": "Results screen entrance."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "logical-canvas",
+        "value": "480x270, integer scale (x4 at 1920x1080)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ficha",
+      "kind": "card",
+      "refersTo": "ficha",
+      "description": "Parchment card with the parcel description, five lines max.",
+      "html": "<div class=\"ds-ficha\">FRASCO DE LÍQUIDO AZUL. LLEVA EL SELLO DEL GREMIO DE ALQUIMISTAS. ORIGEN: VALMORA.</div>",
+      "css": ".ds-ficha { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; width: 600px; padding: 12px 16px; background: #f4f4f4; color: #333c57; border: 4px solid #1a1c2c; font-size: 28px; line-height: 36px; }"
+    },
+    {
+      "name": "Stamp on card",
+      "kind": "chip",
+      "refersTo": "stamp-on-ficha",
+      "description": "Seal frame stamped on the card after a decision.",
+      "html": "<span class=\"ds-stamp\">APROBADO</span>",
+      "css": ".ds-stamp { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; display: inline-block; padding: 8px 16px 8px 72px; background: #f4f4f4; color: #38b764; border: 4px solid #38b764; font-size: 28px; }"
+    },
+    {
+      "name": "Wait seconds",
+      "kind": "custom",
+      "refersTo": "wait-seconds",
+      "description": "Elapsed wait beside the clerk; colour escalates with time.",
+      "html": "<span class=\"ds-wait\">1,6 S</span>",
+      "css": ".ds-wait { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; font-size: 56px; color: #ffcd75; text-shadow: 4px 0 #1a1c2c, -4px 0 #1a1c2c, 0 4px #1a1c2c, 0 -4px #1a1c2c; background: #1a1c2c; padding: 8px; }"
+    },
+    {
+      "name": "Points plate",
+      "kind": "card",
+      "refersTo": "points-plate",
+      "description": "Bottom plate: points in the counter colour, queue on the right.",
+      "html": "<div class=\"ds-points\"><small>PUNTOS</small><b>1235</b></div>",
+      "css": ".ds-points { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; width: 600px; padding: 16px 32px; background: #1a1c2c; border: 4px solid #333c57; color: #566c86; font-size: 28px; } .ds-points b { display: block; color: #a7f070; font-size: 112px; line-height: 1; }"
+    },
+    {
+      "name": "Phase banner",
+      "kind": "custom",
+      "refersTo": "phase-banner",
+      "description": "Full-width announcement at each phase change.",
+      "html": "<div class=\"ds-phase\"><small>FASE 3</small><b>HORA PUNTA</b></div>",
+      "css": ".ds-phase { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; text-align: center; padding: 16px; background: #29366f; border-top: 4px solid #ffcd75; border-bottom: 4px solid #ffcd75; color: #ffcd75; font-size: 28px; } .ds-phase b { display: block; color: #f4f4f4; font-size: 56px; }"
+    },
+    {
+      "name": "Simulated tag",
+      "kind": "chip",
+      "refersTo": "simulated-tag",
+      "description": "Shown whenever ?mock is on; never red.",
+      "html": "<span class=\"ds-sim\">SIMULADO</span>",
+      "css": ".ds-sim { font-family: 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; image-rendering: pixelated; padding: 4px 12px; background: #333c57; color: #f4f4f4; font-size: 28px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The belt is the chart",
+    "overview": "An airport security checkpoint at night, two identical lanes: same luggage, same instant, same rulebook. Latency reads as a consequence, trays heaping in the DeepSeek cart while the Jev belt stays clear. 480x270 logical pixels, 16-colour palette, all art authored in code.",
+    "keyCharacteristics": [
+      "One 480x270 canvas, three 160 px counters, integer upscale.",
+      "Authored 5x7 bitmap capitals, Spanish decimal comma.",
+      "Flat pixel plates, no bevel, blur, radius or gradient.",
+      "One colour per counter; seals carry colour, shape and icon."
+    ],
+    "rules": [
+      {
+        "name": "The One Red Rule",
+        "body": "Seal red always means something went wrong; labels sit on slate.",
+        "section": "colors"
+      },
+      {
+        "name": "The Palette Lock",
+        "body": "No colour outside the sixteen; overlays only darken with night.",
+        "section": "colors"
+      },
+      {
+        "name": "Honest Belt",
+        "body": "Parcel x is its true time-to-deadline; the jam shows in the pit heap and the wait seconds.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the three counters identical in layout.",
+      "Do highlight the LLM in yellow where it is best."
+    ],
+    "donts": [
+      "Don't use em-dashes, eyebrow labels or decorative dots.",
+      "Don't pack or reorder parcels to dramatise the jam."
+    ]
+  }
+}

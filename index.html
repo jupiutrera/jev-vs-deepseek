@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control de seguridad · DeepSeek vs Jev</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #1a1c2c; overflow: hidden; }
+      body { display: flex; align-items: center; justify-content: center; cursor: none; }
+      canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+      /* Aviso de grabación: fuera del lienzo, no sale en el vídeo */
+      #rec { position: fixed; top: 8px; left: 8px; font: 12px/1 monospace; padding: 4px 6px; color: #f4f4f4; display: none; }
+      #rec.live { display: block; background: #b13e53; }
+      #rec.info { display: block; background: #333c57; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" aria-label="Simulación: DeepSeek y Jev deciden qué hacer con el mismo equipaje en un control de seguridad"></canvas>
+    <div id="rec" aria-live="polite"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+node_modules
+dist
+# Claves: nunca al repositorio (sólo la plantilla .env.example)
+.env
+.env.*
+!.env.example
+*.log
+logs
+videos
+# Datos de facturación de las APIs
+usage_data_*.zip

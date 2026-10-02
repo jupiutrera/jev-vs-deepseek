@@ -1,0 +1,21 @@
+{
+  "name": "control-seguridad",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "test:cases": "tsx scripts/cases-check.ts",
+    "test:sim": "tsx scripts/sim-check.ts",
+    "latency": "tsx scripts/latency-check.ts",
+    "summary": "tsx scripts/summary.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}

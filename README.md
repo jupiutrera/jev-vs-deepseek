@@ -119,3 +119,7 @@ mismo nombre que el registro de `logs/`.
 
 - Modo paralelo (el LLM lanza varias llamadas a la vez) como comparativa secundaria.
 - Calibrar fases y umbral con latencias reales (`npm run latency`).
+
+## Licencia
+
+MIT, ver [LICENSE](LICENSE). Para contribuir: haz un fork y abre un pull request.

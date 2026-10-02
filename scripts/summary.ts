@@ -33,8 +33,17 @@ for (const [i, name] of names.entries()) {
       aciertos: r.filter((x) => x.outcome === 'acierto').length,
       perdidos: r.filter((x) => x.outcome === 'perdido').length,
       precision: decided.length ? decided.filter((x) => x.outcome === 'acierto').length / decided.length : 0,
+      // Precisión con tiempo: lo decidido más el análisis posterior de las que cayeron (si lo hay)
+      conTiempo: log.lanes[i].hindsight?.finished
+        ? (() => {
+            const h = log.lanes[i].hindsight!;
+            const n = decided.length + h.done - h.failed;
+            return n ? (decided.filter((x) => x.outcome === 'acierto').length + h.correct) / n : null;
+          })()
+        : null,
       latencia: mean(lat),
-      coste: r.reduce((a, x) => a + x.costUsd, 0),
+      // Incluye las llamadas del análisis posterior, que también se pagan
+      coste: r.reduce((a, x) => a + x.costUsd, 0) + (log.lanes[i].hindsight?.costUsd ?? 0),
     };
   });
   console.log(`${name} (${logs[0].lanes[i].model})`);
@@ -42,6 +51,8 @@ for (const [i, name] of names.entries()) {
   console.log(`  aciertos   ${fmt(per.map((p) => p.aciertos))}`);
   console.log(`  perdidos   ${fmt(per.map((p) => p.perdidos))}`);
   console.log(`  precisión  ${fmt(per.map((p) => p.precision * 100), 1)} %`);
+  const ct = per.map((p) => p.conTiempo).filter((v): v is number => v !== null);
+  if (ct.length) console.log(`  con tiempo ${fmt(ct.map((v) => v * 100), 1)} % (${ct.length} partidas)`);
   console.log(`  latencia   ${fmt(per.map((p) => p.latencia))} ms`);
   console.log(`  coste      $${fmt(per.map((p) => p.coste), 5)}\n`);
 }

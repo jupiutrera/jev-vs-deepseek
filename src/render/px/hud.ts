@@ -57,7 +57,7 @@ export function drawPhaseBanner(ctx: CanvasRenderingContext2D, g: Game) {
   ctx.fillRect(0, y + h - 3, LW, 1);
   text(ctx, `FASE ${g.currentPhase + 1}`, LW / 2, y + 7, P.yellow, { align: 'center' });
   text(ctx, ph.name, LW / 2, y + 18, P.parchment, { scale: 2, outline: P.night, align: 'center' });
-  text(ctx, `${ph.hint} · UNA BANDEJA CADA ${fmtSec(ph.everyS * g.pace)} S`, LW / 2, y + 37, P.stoneLight, { align: 'center' });
+  text(ctx, `UNA BANDEJA CADA ${fmtSec(ph.everyS * g.pace)} S · ${fmtSec(ph.transitS * g.pace)} S EN LA CINTA`, LW / 2, y + 37, P.stoneLight, { align: 'center' });
   ctx.restore();
 }
 
@@ -123,6 +123,25 @@ export function drawPause(ctx: CanvasRenderingContext2D) {
   text(ctx, 'PAUSA', LW / 2, 120, P.parchment, { scale: 3, outline: P.night, align: 'center' });
 }
 
+/** Los resultados esperan a que cada mostrador analice las bandejas que dejó sin decidir. */
+export const statsReady = (g: Game) => g.lanes.every((l) => l.hindsight?.finished ?? true);
+
+export function drawLoading(ctx: CanvasRenderingContext2D, g: Game, sinceMs: number, t: number, flags: HudFlags) {
+  if (sinceMs <= 0) return;
+  cover(ctx, easeOut(sinceMs / 400));
+  if (sinceMs < 250) return;
+  const dots = '.'.repeat(1 + (Math.floor(t * 3) % 3));
+  text(ctx, `CARGANDO LAS ESTADÍSTICAS${dots}`, LW / 2 - measure('CARGANDO LAS ESTADÍSTICAS...', 2) / 2, 104, P.yellow, { scale: 2, outline: P.night });
+  let y = 132;
+  g.lanes.forEach((l, i) => {
+    const h = l.hindsight;
+    if (!h?.total) return;
+    text(ctx, `${l.agent.name.toUpperCase()} ANALIZA SIN PRISA LAS QUE DEJÓ SIN DECIDIR: ${h.done}/${h.total}`, LW / 2, y, LANE_COLOR[i], { align: 'center' });
+    y += 12;
+  });
+  if (flags.mock) tag(ctx, 'DATOS SIMULADOS, NO SON MEDICIONES REALES', LW / 2, LH - 16, 'center');
+}
+
 /** Resultados: una frase con el hallazgo, la tabla honesta y la gráfica de aciertos por minuto. */
 export function drawEnd(ctx: CanvasRenderingContext2D, g: Game, sinceMs: number, flags: HudFlags) {
   if (sinceMs <= 0) return;
@@ -150,7 +169,15 @@ export function drawEnd(ctx: CanvasRenderingContext2D, g: Game, sinceMs: number,
     { label: 'COSTE', vals: stats.map((s) => fmtUsd(s.cost)), nums: stats.map((s) => s.cost), better: 'min' },
     { label: 'COSTE POR LLAMADA', vals: stats.map((s) => fmtUsdSmall(s.costPerCall)), nums: stats.map((s) => s.costPerCall), better: 'min' },
   ];
-  if (g.mode === 'precision') {
+  if (g.mode === 'cronometrado') {
+    // Cuánto habría acertado decidiendo también las que se le cayeron (se analizan al terminar)
+    rows.splice(5, 0, {
+      label: 'PRECISIÓN CON TIEMPO',
+      vals: stats.map((s) => pct(s.potential)),
+      nums: stats.map((s) => s.potential),
+      better: 'max',
+    });
+  } else {
     // La precisión es lo que mide este modo: va primero
     rows.unshift(rows.splice(4, 1)[0]);
     rows.splice(4, 1, {
@@ -217,9 +244,9 @@ function drawRace(ctx: CanvasRenderingContext2D, g: Game, sinceMs: number) {
 function drawChart(ctx: CanvasRenderingContext2D, g: Game, sinceMs: number) {
   if (sinceMs < 0 || !g.endMs) return;
   const x = 64;
-  const y = 136;
+  const y = 146;
   const w = 336;
-  const h = 86;
+  const h = 78;
   plate(ctx, x - 24, y - 14, w + 88, h + 28, P.night, P.slate);
   text(ctx, 'ACIERTOS POR MINUTO', x - 16, y - 9, P.stoneLight);
 

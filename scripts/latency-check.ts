@@ -17,8 +17,7 @@ const status = await (await fetch(`${base}/api/status`)).json();
 setPrices(status.prices);
 if (!status.jev || !status.llm) console.log(`Aviso: faltan claves (jev ${status.jev}, llm ${status.llm})`);
 
-// Mezcla de las cuatro dificultades, por tramos iguales
-const cases = generateCases(seed, n, (i) => Math.floor((i * 4) / n));
+const cases = generateCases(seed, n);
 const agents: Agent[] = [new JevAgent(status.jevModel, base), new LlmAgent(status.llmName, status.llmModel, base)];
 
 const pct = (a: number[], p: number) => {

@@ -8,7 +8,7 @@ import { PACE_BY_THINKING } from './config';
 import { Game, type Mode } from './game';
 import { RunRecorder } from './recorder';
 import { generateCases } from './sim/cases';
-import { drawEnd, drawPause, drawPhaseBanner, drawStart, drawTopStrip, type ApiStatus, type HudFlags } from './render/px/hud';
+import { drawEnd, drawLoading, drawPause, drawPhaseBanner, drawStart, drawTopStrip, type ApiStatus, type HudFlags, statsReady } from './render/px/hud';
 import { LaneRenderer } from './render/px/lane';
 import { LH, LW } from './render/px/palette';
 import { sceneLayer } from './render/px/scene';
@@ -76,6 +76,7 @@ const pace = Number(params.get('ritmo')) || (mock ? 1 : PACE_BY_THINKING[api?.ll
 const game = new Game(makeAgents(api), Number(params.get('seed')) || randomSeed(), (params.get('mode') as Mode) === 'precision' ? 'precision' : 'cronometrado', pace);
 const lanes = game.lanes.map((_, k) => new LaneRenderer(k));
 let endSince: number | null = null;
+let statsSince: number | null = null;
 
 // Cada partida se graba en vídeo con su sonido (?norec lo desactiva). El aviso REC va fuera del
 // lienzo, así que no sale en el vídeo.
@@ -120,6 +121,7 @@ function download() {
 function restart(seed = game.seed, mode = game.mode) {
   game.reset(seed, mode);
   endSince = null;
+  statsSince = null;
   recorder.cancel();
   if (recStopTimer !== null) clearTimeout(recStopTimer);
   recStopTimer = null;
@@ -164,10 +166,23 @@ function frame() {
     else if (ev.type === 'fase') sound.phase(ev.phase);
     else if (ev.type === 'fin') {
       sound.end();
-      // El vídeo termina cuando los resultados llevan unos segundos en pantalla
-      if (recorder.recording) recStopTimer = window.setTimeout(() => void finishRecording(), 9000);
-      // Guardado automático en logs/ del proyecto (sólo con el servidor de Vite delante)
-      fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(game.log()) }).catch(() => {});
+      // El vídeo termina cuando los resultados llevan unos segundos en pantalla y ya se ve la
+      // precisión con tiempo (el análisis posterior), sin pasar de 60 s
+      const finAt = performance.now();
+      const done = game.hindsightDone;
+      if (recorder.recording) {
+        recStopTimer = window.setTimeout(() => void finishRecording(), 60000);
+        void done.then(() => {
+          if (recStopTimer === null || game.hindsightDone !== done) return;
+          clearTimeout(recStopTimer);
+          recStopTimer = window.setTimeout(() => void finishRecording(), Math.max(9000 - (performance.now() - finAt), 6000));
+        });
+      }
+      // Guardado automático en logs/ del proyecto (sólo con el servidor de Vite delante), con el análisis posterior
+      void done.then(() => {
+        if (game.hindsightDone !== done) return;
+        fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(game.log()) }).catch(() => {});
+      });
     }
   }
 
@@ -181,7 +196,11 @@ function frame() {
   if (game.phase === 'fin') {
     endSince ??= now;
     // Pausa breve para que se vean los últimos sellos antes de los resultados
-    drawEnd(ctx, game, now - endSince - 1200, flags);
+    const sinceEnd = now - endSince - 1200;
+    // Las estadísticas esperan al análisis posterior; si hubo pantalla de carga, entran sin volver a fundir
+    if (statsReady(game)) statsSince ??= now;
+    if (statsSince === null) drawLoading(ctx, game, sinceEnd, t, flags);
+    else drawEnd(ctx, game, Math.min(sinceEnd, 400 + now - statsSince), flags);
   }
   recorder.frame();
   requestAnimationFrame(frame);

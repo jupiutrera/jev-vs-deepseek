@@ -1,5 +1,5 @@
 import type { Agent, AgentResult, Stage } from './agents/types';
-import { ERROR_COOLDOWN_MS, GAME_S, PHASES, POINTS, PRECISION_CASES } from './config';
+import { ERROR_COOLDOWN_MS, GAME_S, HINDSIGHT_CONCURRENCY, PHASES, POINTS, PRECISION_CASES } from './config';
 import { generateCases, type Case } from './sim/cases';
 import { SEALS, type Seal } from './sim/rules';
 import { buildSchedule, phaseAt, phaseStartMs, type Arrival } from './sim/schedule';
@@ -33,6 +33,20 @@ export interface DecisionRecord {
   queue: number; // paquetes en cinta al empezar a leerlo
 }
 
+/** Análisis sin prisa, al terminar, de las bandejas que el mostrador dejó sin decidir. */
+export interface Hindsight {
+  total: number;
+  done: number;
+  correct: number;
+  /** Llamadas que fallaron dos veces: no cuentan ni como acierto ni como error. */
+  failed: number;
+  /** Llamadas hechas, reintentos incluidos. */
+  calls: number;
+  costUsd: number;
+  finished: boolean;
+  decisions: { caseId: number; truth: Seal; seal: Seal | null }[];
+}
+
 export type GameEvent =
   | { type: 'sello'; lane: number; seal: Seal; correct: boolean }
   | { type: 'perdido'; lane: number }
@@ -50,7 +64,7 @@ export interface GameLog {
   phases: typeof PHASES;
   points: typeof POINTS;
   endMs: number | null;
-  lanes: { name: string; model: string; records: DecisionRecord[]; apiErrors: { ms: number; error: string }[] }[];
+  lanes: { name: string; model: string; records: DecisionRecord[]; apiErrors: { ms: number; error: string }[]; hindsight?: Hindsight }[];
   cases: { id: number; text: string; seal: Seal }[];
 }
 
@@ -73,6 +87,7 @@ export class Lane {
   lostHit = -1e9;
   spawned = 0;
   doneMs: number | null = null;
+  hindsight: Hindsight | null = null;
 
   constructor(readonly index: number, readonly agent: Agent) {}
 
@@ -107,14 +122,28 @@ export class Lane {
     }
     const decided = aciertos + errores;
     // Llamadas a la API: las decididas y las abandonadas porque el paquete cayó (también cuestan)
-    const calls = this.records.filter((r) => r.startMs !== null).length;
+    let calls = this.records.filter((r) => r.startMs !== null).length;
+    // Y las del análisis posterior de las que cayeron: también se pagan
+    if (this.hindsight) {
+      cost += this.hindsight.costUsd;
+      calls += this.hindsight.calls;
+    }
     return {
       aciertos, errores, perdidos, puntos, cost, decided, calls,
       costPerCall: calls ? cost / calls : null,
       avgLatency: nLat ? lat / nLat : null,
       accuracy: decided ? aciertos / decided : null,
+      potential: this.potential(aciertos, decided),
       lastError: this.apiErrors.length ? this.apiErrors[this.apiErrors.length - 1] : undefined,
     };
+  }
+
+  /** Acierto sobre todas las bandejas si hubiera tenido tiempo: lo decidido más el análisis posterior. */
+  private potential(aciertos: number, decided: number): number | null {
+    const h = this.hindsight;
+    if (!h?.finished) return null;
+    const n = decided + h.done - h.failed;
+    return n ? (aciertos + h.correct) / n : null;
   }
 }
 
@@ -127,6 +156,9 @@ export class Game {
   events: GameEvent[] = [];
   currentPhase = 0;
   endMs: number | null = null;
+  /** Se resuelve cuando todos los mostradores han terminado el análisis posterior. */
+  hindsightDone: Promise<void> = Promise.resolve();
+  private hindsightCtrl: AbortController | null = null;
   private next = 0;
   private generation = 0;
   private date = '';
@@ -139,13 +171,13 @@ export class Game {
   reset(seed = this.seed, mode = this.mode) {
     this.generation++;
     for (const l of this.lanes) l.current?.ctrl.abort();
+    this.hindsightCtrl?.abort();
+    this.hindsightCtrl = null;
+    this.hindsightDone = Promise.resolve();
     this.seed = seed;
     this.mode = mode;
-    // La dificultad sube con la fase; en modo precisión, por tramos iguales de la secuencia
-    this.cases =
-      mode === 'precision'
-        ? generateCases(seed, PRECISION_CASES, (i) => Math.floor((i * PHASES.length) / PRECISION_CASES))
-        : generateCases(seed, this.schedule.length, (i) => this.schedule[i].phase);
+    // Dificultad constante: los niveles se reparten al azar por toda la secuencia
+    this.cases = generateCases(seed, mode === 'precision' ? PRECISION_CASES : this.schedule.length);
     this.lanes = this.agents.map((a, i) => new Lane(i, a));
     this.phase = 'listo';
     this.wallMs = 0;
@@ -226,6 +258,48 @@ export class Game {
     this.phase = 'fin';
     this.endMs = now;
     this.events.push({ type: 'fin' });
+    if (this.mode === 'cronometrado') this.startHindsight();
+  }
+
+  /**
+   * Sin cinta ni reloj: cada mostrador decide las bandejas que dejó sin decidir, varias a la vez.
+   * Empieza al terminar (no durante la partida) para que estas llamadas no frenen las de verdad.
+   */
+  private startHindsight() {
+    const gen = this.generation;
+    const ctrl = new AbortController();
+    this.hindsightCtrl = ctrl;
+    this.hindsightDone = Promise.all(
+      this.lanes.map(async (l) => {
+        const todo = l.records.filter((r) => r.outcome === 'perdido').map((r) => this.cases.find((c) => c.id === r.caseId)!);
+        const h: Hindsight = { total: todo.length, done: 0, correct: 0, failed: 0, calls: 0, costUsd: 0, finished: false, decisions: [] };
+        l.hindsight = h;
+        let i = 0;
+        const ask = async (c: Case) => {
+          const res = await l.agent.decide(c, { signal: ctrl.signal });
+          if (gen === this.generation) {
+            h.calls++;
+            h.costUsd += res.costUsd;
+          }
+          return res;
+        };
+        const worker = async () => {
+          while (i < todo.length) {
+            const c = todo[i++];
+            let res = await ask(c);
+            // Un reintento si falla la API: aquí no hay prisa
+            if (!res.seal && !ctrl.signal.aborted) res = await ask(c);
+            if (gen !== this.generation) return;
+            h.decisions.push({ caseId: c.id, truth: c.seal, seal: res.seal });
+            if (!res.seal) h.failed++;
+            else if (res.seal === c.seal) h.correct++;
+            h.done++;
+          }
+        };
+        await Promise.all(Array.from({ length: Math.min(HINDSIGHT_CONCURRENCY, todo.length) }, worker));
+        if (gen === this.generation) h.finished = true;
+      }),
+    ).then(() => {});
   }
 
   /**
@@ -311,7 +385,7 @@ export class Game {
       phases: PHASES,
       points: POINTS,
       endMs: this.endMs,
-      lanes: this.lanes.map((l) => ({ name: l.agent.name, model: l.agent.model, records: l.records, apiErrors: l.apiErrors })),
+      lanes: this.lanes.map((l) => ({ name: l.agent.name, model: l.agent.model, records: l.records, apiErrors: l.apiErrors, hindsight: l.hindsight ?? undefined })),
       cases: this.cases.map((c) => ({ id: c.id, text: c.text, seal: c.seal })),
     };
   }

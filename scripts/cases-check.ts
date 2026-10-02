@@ -8,7 +8,7 @@ import { SEALS, type Seal } from '../src/sim/rules';
 const seed = Number(process.argv[2]) || 1;
 const sched = buildSchedule();
 const n = sched.length;
-const cases = generateCases(seed, n, (i) => sched[i].phase);
+const cases = generateCases(seed, n);
 
 // Clasificador ingenuo: lo que haría un `if` con palabras sueltas
 function keywords(text: string): Seal {
@@ -37,7 +37,7 @@ console.log('reparto:', SEALS.map((s) => `${s} ${dist[s] ?? 0}`).join(' · '));
 console.log(`fichas que no caben: ${tooLong} (máximo ${maxLines}/${FICHA_LINES} líneas)`);
 console.log(`clasificador por palabras clave: ${kwOk}/${n} = ${Math.round((kwOk / n) * 100)}% de acierto`);
 
-// Por fase: qué parte del acierto del clasificador ingenuo se mantiene al subir la dificultad
+// Por fase: con la dificultad constante, todas deberían parecerse
 for (let ph = 0; ph < 4; ph++) {
   const cs = cases.filter((c) => sched[c.id].phase === ph);
   const ok = cs.filter((c) => keywords(c.text) === c.seal).length;

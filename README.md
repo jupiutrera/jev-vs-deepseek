@@ -49,6 +49,7 @@ la latencia en el propio servidor**, desde que sale la petición hasta que llega
   estrategia, no la peor).
 - Si la bandeja llega al final mientras el agente la lee, la llamada se abandona (se corta
   también hacia la API) y se le apunta el coste estimado de la entrada.
+- **Precisión con tiempo**: al terminar, cada mostrador decide sin prisa (6 llamadas en paralelo, `HINDSIGHT_CONCURRENCY` en `src/config.ts`) las bandejas que se le cayeron. Mientras tanto la pantalla dice "CARGANDO LAS ESTADÍSTICAS…" con el progreso; después, los resultados muestran cuánto habría acertado decidiéndolas todas ("PRECISIÓN CON TIEMPO"). Se lanza al final y no durante la partida para no frenar las llamadas de verdad. No cuenta en puntos, pero sí en el coste y en el coste por llamada (son llamadas que se pagan); queda en el registro (`hindsight`) y el vídeo espera a que termine (máximo 60 s).
 - Puntos: acierto +10, error −5, dejar pasar algo que era alerta −25. Una bandeja sin decidir no
   suma ni resta: sólo restan los errores.
 - Cuatro fases de 45 s: una bandeja cada 2,0 / 0,9 / 0,6 / 0,4 s, con 3,0 / 1,8 / 1,3 / 1,0 s de cinta,
@@ -57,12 +58,13 @@ la latencia en el propio servidor**, desde que sale la petición hasta que llega
   curva sea la misma (todos al día al principio, el LLM se hunde al final): ×1 sin razonamiento,
   ×1,8 con `low`, ×2,3 con `high`, ×3 con `max` (este último estimado). La portada lo indica.
   `?ritmo=1.5` en la URL lo fuerza.
-- **Dificultad progresiva**: cada fase trae partes de rayos X más difíciles, y el cartel de fase lo anuncia.
+- **Dificultad constante**: hay cuatro niveles de parte de rayos X y se reparten por toda la partida
+  (cada bloque de 4 bandejas seguidas tiene uno de cada, en orden aleatorio con la semilla). La
+  presión la pone sólo el ritmo de las fases.
   1. Partes sencillos: 1 o 2 objetos y cifras claras.
   2. Cifras al límite (100 ml, 6 cm, 100 y 160 Wh, 350 g) y excepciones (receta, bebé, duty-free).
   3. Unidades mezcladas (cl, l, mm, kg) y 2 o 3 objetos cuyas reglas chocan.
   4. Cuentas: baterías en mAh y voltios (Wh = mAh × V / 1.000) y la suma de la bolsa de líquidos (máximo 1 litro).
-  En modo precisión, las 40 bandejas recorren los cuatro niveles por tramos iguales.
 
 ## Calibración (fase 2 del plan)
 

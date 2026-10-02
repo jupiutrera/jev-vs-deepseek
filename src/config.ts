@@ -6,15 +6,13 @@ export interface PhaseDef {
   durationS: number;
   everyS: number; // un paquete nuevo cada X segundos
   transitS: number; // lo que tarda un paquete en recorrer la cinta
-  /** Qué tipo de partes llegan en esta fase (la dificultad sube con cada una). */
-  hint: string;
 }
 
 export const PHASES: PhaseDef[] = [
-  { name: 'MADRUGADA', durationS: 45, everyS: 2.0, transitS: 3.0, hint: 'PARTES SENCILLOS' },
-  { name: 'PRIMEROS VUELOS', durationS: 45, everyS: 0.9, transitS: 1.8, hint: 'CIFRAS AL LÍMITE Y EXCEPCIONES' },
-  { name: 'HORA PUNTA', durationS: 45, everyS: 0.6, transitS: 1.3, hint: 'UNIDADES MEZCLADAS Y REGLAS QUE CHOCAN' },
-  { name: 'OPERACIÓN SALIDA', durationS: 45, everyS: 0.4, transitS: 1.0, hint: 'HAY QUE HACER CUENTAS' },
+  { name: 'MADRUGADA', durationS: 45, everyS: 2.0, transitS: 3.0 },
+  { name: 'PRIMEROS VUELOS', durationS: 45, everyS: 0.9, transitS: 1.8 },
+  { name: 'HORA PUNTA', durationS: 45, everyS: 0.6, transitS: 1.3 },
+  { name: 'OPERACIÓN SALIDA', durationS: 45, everyS: 0.4, transitS: 1.0 },
 ];
 
 export const GAME_S = PHASES.reduce((a, p) => a + p.durationS, 0);
@@ -42,3 +40,9 @@ export const ERROR_COOLDOWN_MS = 1000;
 /** Modo precisión: casos por mostrador; los paquetes esperan lo que haga falta. */
 export const PRECISION_CASES = 40;
 export const PRECISION_RIDE_MS = 600;
+
+/**
+ * Al terminar, cada mostrador analiza sin prisa las bandejas que se le quedaron sin decidir, para
+ * saber cuánto habría acertado con tiempo para todas. Llamadas en paralelo a la vez.
+ */
+export const HINDSIGHT_CONCURRENCY = 6;

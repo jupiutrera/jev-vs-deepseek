@@ -1,5 +1,5 @@
 import { wrap } from '../render/px/font';
-import { mulberry32 } from './rng';
+import { hash01, mulberry32 } from './rng';
 import { PRIORITY, type Seal } from './rules';
 
 // Generador de partes de rayos X con semilla fija. Cada fragmento lleva la regla que activa; la
@@ -25,8 +25,9 @@ type Rule = 'A1' | 'A2' | 'A3' | 'A4' | 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' 
 type Fixed = string | [string, Rule];
 type Rng = () => number;
 /**
- * Nivel de dificultad del parte (0 a 3, uno por fase): 0 cifras claras; 1 cifras al límite y
- * excepciones; 2 unidades mezcladas y reglas que chocan; 3 cuentas (mAh x V, suma de líquidos).
+ * Nivel de dificultad del parte (0 a 3): 0 cifras claras; 1 cifras al límite y excepciones;
+ * 2 unidades mezcladas y reglas que chocan; 3 cuentas (mAh x V, suma de líquidos). Los niveles se
+ * reparten al azar a lo largo de la partida: la dificultad es constante y la presión la pone el ritmo.
  */
 type Level = number;
 /** Un fragmento puede ser fijo o generarse con cifras según el nivel. */
@@ -160,8 +161,18 @@ export function sealFor(rules: string[]): Seal {
 
 export const fichaLines = (text: string) => wrap(text, FICHA_TEXT_W);
 
+/**
+ * Nivel de cada caso: cada bloque de 4 bandejas seguidas tiene uno de cada nivel, en orden
+ * aleatorio con la semilla. Así los casos difíciles salen repartidos por toda la partida.
+ */
+export const mixedLevels = (seed: number) => (i: number): Level => {
+  const block = Math.floor(i / 4);
+  const order = [0, 1, 2, 3].sort((x, y) => hash01(seed, block, x, 31) - hash01(seed, block, y, 31));
+  return order[i % 4];
+};
+
 /** Secuencia determinista de `n` casos para una semilla; `levelOf(i)` da la dificultad de cada uno. */
-export function generateCases(seed: number, n: number, levelOf: (i: number) => Level = () => 0): Case[] {
+export function generateCases(seed: number, n: number, levelOf: (i: number) => Level = mixedLevels(seed)): Case[] {
   const rng = mulberry32(seed * 7919 + 17);
   const pick = <T>(a: T[]) => pickR(rng, a);
 
